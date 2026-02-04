@@ -1,0 +1,90 @@
+                                            Cypress Architecture
+                                            --------------------
+
+High-level idea:
+Cypress runs inside the browser and tightly controls the test + app execution in the same runtime
+
+
+                                        ┌────────────┐
+                                        │ Test Code  │  (JavaScript)
+                                        └─────┬──────┘
+                                            │
+                                        ┌─────▼─────────────────────┐
+                                        │ Cypress Runner (Node.js)   │
+                                        │ - Manages test lifecycle  │
+                                        │ - Communicates with browser
+                                        └─────┬─────────────────────┘
+                                            │ WebSocket
+                                        ┌─────▼────────────────────────────┐
+                                        │ Browser (Chrome / Firefox / etc.) │
+                                        │ ┌──────────────────────────────┐ │
+                                        │ │ Cypress Driver (Injected)    │ │
+                                        │ │ - Runs inside browser        │ │
+                                        │ │ - Direct access to DOM       │ │
+                                        │ │ - Controls app + assertions  │ │
+                                        │ └──────────────────────────────┘ │
+                                        │ ┌──────────────────────────────┐ │
+                                        │ │ Your Application Under Test  │ │
+                                        │ └──────────────────────────────┘ │
+                                        └──────────────────────────────────┘
+
+                                        Strengths from this architecture
+
+Extremely fast DOM access
+Automatic waits and retries
+Excellent debugging (time travel, snapshots)
+
+                                    Limitations caused by this architecture
+
+No true cross-origin or multi-tab testing (historically painful)
+Less realistic user simulation
+Browser-only (no mobile emulation at OS level)
+
+                                            Playwright Architecture
+                                            -----------------------
+
+High-level idea:
+Playwright controls browsers from the outside, using a driver protocol, much closer to real user behavior.
+
+                                    ┌────────────┐
+                                    │ Test Code  │  (JS / TS / Python / Java / C#)
+                                    └─────┬──────┘
+                                        │
+                                    ┌─────▼─────────────────────┐
+                                    │ Playwright Client Library │
+                                    │ - Language bindings       │
+                                    └─────┬─────────────────────┘
+                                        │
+                                    ┌─────▼─────────────────────┐
+                                    │ Playwright Driver         │
+                                    │ - Manages browser sessions
+                                    │ - Talks via browser protocol
+                                    └─────┬──────────────┬──────┘
+                                        │              │
+                                    ┌─────▼──────┐ ┌─────▼──────┐
+                                    │ Chromium   │ │ Firefox    │ │ WebKit
+                                    │ Browser    │ │ Browser    │ │ Browser
+                                    │ (real)     │ │ (real)     │ │ (real)
+                                    └────────────┘ └────────────┘
+
+                                   In Each Browser
+                                        └── Browser Context (isolated session)
+                                            └── Page (tab)
+                                                └── Your Application
+
+
+                                        Strengths from this architecture
+                                        --------------------------------
+
+Very close to real user behavior
+Excellent cross-browser consistency
+Strong support for:
+    Multiple tabs
+    Multiple users
+    iFrames
+    Cross-origin flows
+
+Tradeoffs
+    Debugging is improving but less “visual” than Cypress
+    Slightly more boilerplate
+    No shared JS context with the app
