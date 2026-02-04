@@ -1,0 +1,247 @@
+                            1️⃣ Reliable End-to-End Testing (Auto-wait & Stability)
+                            ------------------------------------------------------
+
+Playwright has built-in auto-waiting for everything:
+
+element to appear
+element to be visible
+element to be enabled
+network to be idle
+animations to finish
+
+await page.click('#submit');
+await page.waitForURL('/dashboard');
+
+
+No manual waits needed — Playwright automatically waits until:
+
+#submit is attached, visible, clickable
+navigation fully completes
+
+                                        Cypress comparison
+
+cy.get('#submit').click()
+cy.url().should('include', '/dashboard')
+
+
+Cypress retries assertions, not actions
+
+If app has complex async behavior, you often need:
+
+cy.wait(2000) // flaky but common
+
+Why Playwright is more stable
+
+✔ Playwright controls the browser at the protocol level
+✔ Cypress runs inside the browser event loop
+
+Result:
+
+Playwright handles race conditions better
+Fewer flaky tests in large, dynamic apps
+
+                                    2️⃣ Cross-Browser Compatibility
+                                    ------------------------------
+
+Playwright supports real browser engines:
+    Chromium (Chrome, Edge)
+    Firefox
+    WebKit (Safari engine)
+
+
+Cypress mainly supports: Chromium browsers
+
+Why Cypress can’t control multiple browsers at once?
+---------------------------------------------------
+
+Basically, in cypress your test code and your application code:
+    run in the same JS thread
+    share the same event loop
+
+Each browser has:
+    its own JS engine
+    its own event loop
+    its own memory space
+
+Since Cypress test code lives inside one browser:
+It can only control that single browser instance
+
+
+Why Cypress can’t do multi-tab?
+------------------------------
+
+Tabs are:
+    separate browsing contexts
+    separate JS worlds
+    separate event loops
+    Cypress injects itself into one tab only.
+
+When your app opens a new tab -> window.open('/new-page')
+
+Cypress:
+    loses control
+    cannot inject itself into the new tab
+
+
+What Cypress does instead
+    cy.stub(window, 'open')
+    👉 Which means you are no longer testing real behavior.
+
+Playwright contrast --> Playwright controls tabs at the browser protocol level:
+
+const [newPage] = await Promise.all([
+  context.waitForEvent('page'),
+  page.click('#open-tab')
+]);
+
+
+This is impossible in Cypress because of event loop isolation.
+
+
+                                    Native OS-Level Interaction
+                                    ---------------------------
+
+Playwright can:
+    Handle file chooser dialogs
+    Capture downloads
+    Control permissions
+    Handle clipboard
+    Work with native auth dialogs
+
+    const [download] = await Promise.all([
+    page.waitForEvent('download'),
+    page.click('#export')
+    ]);
+
+    await download.saveAs('report.pdf');
+
+Cypress
+    ❌ No native download control
+    ❌ No OS dialogs
+    ⚠️ Uses DOM shortcuts instead
+
+
+                            Network Control at Protocol Level
+                            ---------------------------------
+
+Playwright
+    Intercept
+    Modify
+    Mock
+    Continue
+    Abort
+    Inspect response bodies
+
+    await page.route('/api/user', route =>
+    route.fulfill({
+        status: 200,
+        body: JSON.stringify({ name: 'Mock User' })
+    })
+    );
+
+Cypress
+
+    Can stub requests
+    ❌ Cannot modify low-level browser behavior
+    ❌ Cannot observe raw browser protocol traffic
+
+
+                                    3️⃣ Multiplatform Support (OS & Devices)
+                                    ---------------------------------------
+
+Playwright strengths
+
+    Windows, macOS, Linux
+    Mobile emulation (Chrome Android, Safari iOS)
+    Multiple browser contexts (isolated sessions)
+
+    const context = await browser.newContext({
+    viewport: { width: 375, height: 812 },
+    userAgent: 'iPhone'
+    });
+
+Cypress limitations
+    No true browser contexts and multi user parallel sessions login
+
+
+What counts as OS-level?
+-----------------------
+
+File chooser dialogs
+    Native alerts
+    Downloads
+    Clipboard
+    Permissions
+    Multiple windows
+    System authentication popups
+
+Cypress limitation
+
+Because Cypress runs inside the browser sandbox:
+    It cannot access OS APIs
+    It cannot intercept native dialogs
+    It cannot observe real file downloads
+
+Why cy.task() cannot fix this?
+------------------------------
+
+It runs in a separate Node process
+
+❌ cy.task() cannot:
+    control another browser
+    open a new tab
+    interact with native dialogs
+    intercept browser events
+    synchronize with browser rendering
+
+Because:
+It cannot inject JS into other contexts
+It cannot pause or control browser execution
+
+cy.task() is a helper, not a browser controller
+
+
+                                    4️⃣ Multilingual Flexibility
+                                    ---------------------------
+
+Playwright Supports:
+    JavaScript / TypeScript
+    Python
+    Java
+    C# (.NET)
+
+This means:
+    Backend teams can write E2E in same language
+    Better integration in enterprise environments
+
+Cypress Supports JavaScript / TypeScript only --> Great for frontend teams, limiting for others.
+
+
+                            6️⃣ Event Loop Blocking: Real Flakiness Example
+                            ----------------------------------------------
+
+Note: Cypress can only retry assertions, not actions
+
+Example:
+    cy.get('#save').click()
+    cy.get('.toast').should('be.visible')
+
+If your app:
+    blocks the event loop briefly
+    re-renders slowly
+
+Cypress:
+    may miss the DOM change
+    retries assertions but can’t retry the click
+    leads to flaky tests
+
+Playwright
+
+    Runs externally:
+
+    await page.click('#save');
+    await page.waitForSelector('.toast');
+
+
+    Browser rendering happens independently.
+
