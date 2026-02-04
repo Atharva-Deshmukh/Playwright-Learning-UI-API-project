@@ -1,0 +1,21 @@
+Full Page, Element & Trace Recording
+------------------------------------
+    Playwright
+    Video
+    Screenshots
+    Execution trace (DOM, network, console, snapshots)
+
+    use: {
+    trace: 'on-first-retry',
+    video: 'retain-on-failure'
+    }
+
+
+    You can literally rewind the test.
+
+
+Browser context management
+--------------------------
+
+Mobile & Device Emulation (Realistic)
+-------------------------------------
