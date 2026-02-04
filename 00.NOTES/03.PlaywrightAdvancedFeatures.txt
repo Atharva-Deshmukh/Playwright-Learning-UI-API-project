@@ -1,17 +1,9 @@
 Full Page, Element & Trace Recording
 ------------------------------------
-    Playwright
-    Video
-    Screenshots
-    Execution trace (DOM, network, console, snapshots)
+    Trace is the game-changer
 
-    use: {
-    trace: 'on-first-retry',
-    video: 'retain-on-failure'
-    }
-
-
-    You can literally rewind the test.
+    For every test line in trace, we can see source code of that corresponding test in source tab
+    We have clear details for network logs at particular code line execution
 
 
 Browser context management
