@@ -1,15 +1,74 @@
 import { test, expect, chromium } from '@playwright/test';
 
-/* We can directly use page fixture when we don't need to create a new page instance, 
-   No login or proxy settings is required
-   
-   But when we do require to setup authentication, proxies...
-   We use browserContext and then create a page from it
+/* BrowserContexts provide a way to operate multiple independent browser sessions. 
 
-   In single browser tests, like cypress, we cannot simultaneously login with multiple users and test
-   we need to logout first and then sign in with the next user.
 
-   But in playwright, we can create multiple browser contexts and simulate multiple users without logging out. */
+Its like creating a new browser instance like incognito mode with some configurations, cookies beforehand
+
+Ex: Our app may not open without proxy, so we can tell playwright browser.newContext() to create 
+    a new browser instance with some proxy, cookies that we can pass in as parameter.
+
+
+                            MENTAL MODEL TO REMEMBER:
+                            ------------------------
+
+                            browser (Chromium process)
+                            ├── context A (incognito profile)
+                            │    ├── page 1 (tab)
+                            │    └── page 2
+                            ├── context B (another incognito profile)
+                            │    └── page 1
+
+
+                                      CODE EXAMPLE
+                                      ------------
+
+                            const browser = await chromium.launch();
+
+                            const context = await browser.newContext(); // fresh session
+                            const page = await context.newPage();       // new tab
+
+                            await page.goto('https://example.com');
+
+
+                                      WHAT HAPPENS
+                                      ------------
+
+                              chromium (browser type)
+                                ↓ launch()
+                              browser (running Chromium process)
+                                ↓ newContext()
+                              context (incognito-like profile)
+                                ↓ newPage()
+                              page (tab)
+
+IMPORTANT: without launch(), there is no browser process running to create a context inside.
+
+
+But Sometimes, Playwright Test doesn’t call launch explicitly - that’s the exception, not the rule.
+
+Ex: 
+  test('example', async ({ page }) => {
+    await page.goto('https://example.com');
+  });
+
+Playwright automatically:
+  launches the browser
+  creates a context
+  creates a page
+  cleans everything up after the test
+  So launch() is still happening — just under the hood. 
+  
+When using Playwright Test, we don’t need to manually create a browser or browser context. 
+Playwright automatically launches the default browser, creates a fresh browser context for each test, 
+and provides a page fixture that belongs to that context. All default settings are handled by 
+Playwright unless we explicitly customize them.
+We can directly use {page} fixture and rest everything is taken care of
+
+The page fixture automatically gives us a page inside a fresh default browser context, 
+without manually launching the browser or creating a context.
+  
+*/
 
 test('Browser context for logging in with muliple users simultaneoulsy', async ({ page }) => {
 
