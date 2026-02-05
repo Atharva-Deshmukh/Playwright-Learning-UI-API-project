@@ -88,3 +88,35 @@ Tradeoffs
     Debugging is improving but less “visual” than Cypress
     Slightly more boilerplate
     No shared JS context with the app
+
+
+        If playwright and selenium both run outside browser, why playwright is faster than selenium
+        -------------------------------------------------------------------------------------------
+
+The difference in performance isn’t where they run, it’s how the protocol is designed.
+
+Selenium (WebDriver)
+
+    Uses the W3C WebDriver protocol 
+    HTTP protocol + JSON response
+    
+    Every action is a round trip -> click → HTTP request → browser → response
+
+
+    The protocol is generic.
+
+    It was Designed when browsers exposed very little internal state
+
+    Result -> Lots of small, synchronous calls = latency
+
+Playwright
+
+Uses browser-native debugging protocols
+    Chromium → CDP
+    WebKit → Apple’s automation protocol
+
+    Long-lived WebSocket connection
+    Commands are batched, async, and event-driven
+    Can subscribe to browser events instead of polling
+
+Result -> Fewer round trips + streaming events = much faster
