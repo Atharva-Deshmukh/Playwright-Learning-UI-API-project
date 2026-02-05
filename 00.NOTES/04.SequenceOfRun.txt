@@ -1,0 +1,63 @@
+when we run npx playwright test,
+
+playwright blindly runs all the specs under testDir in config.ts file
+
+specs inside directories are run in parallel
+
+test()s inside each spec are run in a sequence
+
+NOTE:
+
+Parallel unit   → spec files
+Sequential unit → tests inside a spec file
+Directories     → ignored for execution order
+
+
+Directories don’t matter. Files do.
+
+What actually runs in parallel?
+
+Playwright Test runs test files (specs) in parallel, not directories.
+
+    Given this structure lets say:
+
+    Directory-1/
+    ├── spec1.spec.ts
+    └── spec2.spec.ts
+
+    Directory-2/
+    ├── spec3.spec.ts
+    └── spec4.spec.ts
+
+Default behavior (workers > 1)
+
+spec1, spec2, spec3, and spec4 are all independent test files
+Any of them can run in parallel, regardless of directory
+Assignment to workers is based on availability, not directory grouping
+
+So:
+    ❌ Directory-1 does not run as a unit
+    ❌ spec1 and spec2 are not guaranteed to be sequential
+    ✅ Any spec can run in parallel with any other spec
+
+What is guaranteed to be sequential?
+    ✔ test() blocks inside the same spec file run sequentially
+    ✔ Tests inside test.describe.serial() run sequentially
+
+Example:
+
+test.describe.serial('serial block', () => {
+  test('A', async () => {});
+  test('B', async () => {});
+});
+
+How to make behavior match your assumption
+1️⃣ Force everything in a directory to be sequential
+
+Use one worker:
+
+// playwright.config.ts
+workers: 1
+
+2️⃣ Make a specific file run serially
+test.describe.serial(...)
