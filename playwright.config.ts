@@ -77,8 +77,9 @@ export default defineConfig({
     // Collect trace for every test (enables time travel in UI)
     trace: 'on',
     colorScheme: 'dark', /* Dark mode */
-    permissions: ["clipboard-read"],
+    permissions: ['clipboard-read', 'clipboard-write'],  // this works for chromium but not for firefox, hence commenting
     video: 'off',
+    // headless: false, True by default, so need to pass --headed in commands, But to avoid --headed in commands, use this flag
 
     /* For HTTP Authentication alerts */
     httpCredentials: {
