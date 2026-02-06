@@ -5,10 +5,10 @@ test('Handling inputs', async ({page}) => {
     await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
     expect(await page.title()).toBe('OrangeHRM');
 
-    const loginHeader = await page.getByText('Login').first();
-    const usernameInput = await page.locator('[name="username"]');
-    const passwordInput = await page.locator('[name="password"]');
-    const loginButton = await page.locator('button[type="submit"]');
+    const loginHeader = page.getByText('Login').first();
+    const usernameInput = page.locator('[name="username"]');
+    const passwordInput = page.locator('[name="password"]');
+    const loginButton = page.locator('button[type="submit"]');
 
     expect(await loginHeader).toBeVisible();
     expect(await usernameInput).toBeVisible();
