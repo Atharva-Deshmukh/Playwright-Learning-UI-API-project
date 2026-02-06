@@ -1,0 +1,10 @@
+IDEAS:
+-----
+new page handling in playwright from some page
+Timeouts - TODO
+
+
+TOPICS COVERED:
+--------------
+Browser Context
+Timeouts
