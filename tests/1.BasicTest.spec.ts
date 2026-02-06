@@ -43,7 +43,7 @@ test('Locator with multiple matches', async ({ page }) => {
 ]*/
 });
 
-test('Extract text from locator', async ({ page }) => {
+test.only('Extract text from locator', async ({ page }) => {
 
   const url: string = 'https://practice-automation.com/tables/';
   const expectedPageTitle: string = 'Tables | Practice Automation';
@@ -54,6 +54,8 @@ test('Extract text from locator', async ({ page }) => {
   await expect(tableCellLocator.first()).toBeVisible();
 
   expect(await tableCellLocator.first().innerText()).toBe('Item');
+  expect(await tableCellLocator.first()).toContainText('Item');
+  expect(await tableCellLocator.first()).toContainText(/^Item$/);
 });
 
 /* just like cypress' :contains() 
