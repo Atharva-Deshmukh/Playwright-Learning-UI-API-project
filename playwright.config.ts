@@ -92,6 +92,7 @@ export default defineConfig({
   },
 
   expect: {
+    timeout: 5000,    // expect timeout
     toHaveScreenshot: {
       pathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}.png'
     }
