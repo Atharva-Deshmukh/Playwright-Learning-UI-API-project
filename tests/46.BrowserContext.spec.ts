@@ -1,4 +1,4 @@
-import { test, expect, chromium } from '@playwright/test';
+import { test, expect, chromium, firefox } from '@playwright/test';
 
 /* BrowserContexts provide a way to operate multiple independent browser sessions. 
 
@@ -74,28 +74,36 @@ test('Browser context for logging in with muliple users simultaneoulsy', async (
 
   const url: string = 'https://practice-automation.com/form-fields/';
 
-  /* Browser, of which separate browser instances will be created */
-  const browser = await chromium.launch({
+  /* Browser process */
+  const chormiumBrowserProcess = await chromium.launch({
     headless: false,
   });
 
-  const browser_context_1 = await browser.newContext();
+  const firefoxBrowserProcess = await firefox.launch({
+    headless: false,
+  });
+
+  const browser_context_1 = await chormiumBrowserProcess.newContext();
   const page_1 = await browser_context_1.newPage();
 
-  const browser_context_2 = await browser.newContext();
+
+  /* Some browsers require specific permissions while others don't like chromium requires clipboard
+   but firefox don't 
+
+   In config.ts file -> we have -> 
+      use {
+        permissions: ['clipboard-read', 'clipboard-write'], 
+       }
+*/
+
+  const browser_context_2 = await firefoxBrowserProcess.newContext({
+    permissions: [], // firefox don't need any permissions
+  });
   const page_2 = await browser_context_2.newPage();
 
   await page_1.goto(url);
-  /* Assertions here */
+  await expect(page_1).toHaveTitle("Form Fields | Practice Automation");
 
-  await page_2.goto(url);
-  /* Assertions here */
-
-  await browser_context_1.close(); /* Close the first context */
-  await browser_context_2.close(); /* Close the second context */
-
-  await browser.close(); /* Close the browser */
-
-  // pause the page indefinitely
-  await new Promise(() => {})
+  await page_2.goto(url, { waitUntil: 'domcontentloaded' });  // firefox is very slow, hence wait
+  await expect(page_2).toHaveTitle("Form Fields | Practice Automation");
 });
