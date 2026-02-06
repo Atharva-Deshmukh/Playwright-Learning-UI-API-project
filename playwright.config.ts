@@ -56,6 +56,8 @@ export default defineConfig({
   /* Spec pattern in playwright */
   testDir: './tests', //specify the directory where your test files are located
   testMatch: '**/*.spec.ts', // Only files ending with .spec.ts will be considered as test files
+   
+  timeout: 30000, // timeout for overall test
 
   /* Run tests in files in parallel - Default*/
   // fullyParallel: true,
