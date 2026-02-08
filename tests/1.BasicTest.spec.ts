@@ -43,6 +43,100 @@ test('Locator with multiple matches', async ({ page }) => {
 ]*/
 });
 
+/* Text Extraction cocept
+   ----------------------
+
+   <div id="status">
+    Loading...
+    <span style="display:none">secret</span>
+  </div>
+
+ ---------------------------------------------------------
+  textContent() ->  Returns the raw text content of the node from the DOM.
+                    Returns the text of the first matching element only
+                    use this to get all locator's content -> allTextContents();
+
+  Key traits:
+    Includes hidden text (display: none, visibility: hidden)
+    Includes text from script/style nodes
+    Preserves whitespace exactly as in the DOM
+    Very fast and very literal
+
+  Example:
+    await page.textContent('#status');  -->  "\n  Loading...\n  secret\n"
+
+  ---------------------------------------------------------
+  innerText() -> Returns the rendered, human-visible text, similar to what a user sees.
+                 innerText() also returns only the first matching element.
+                 use this to get all locator's content -> allInnerTexts();
+
+  Key traits:
+    ❌ Excludes hidden elements
+    ✅ Respects CSS and layout
+    ✅ Normalizes whitespace (collapses spaces, trims lines)
+    ❌ Triggers layout → slower than textContent()
+
+  Example:
+    await page.innerText('#status');  -->  "Loading..."
+
+  Use it when:
+    You want to test what the user actually sees
+    You’re asserting UI labels, buttons, messages
+    Visibility matters
+
+   ---------------------------------------------------------
+  allTextContents() ->  Returns an array of textContent values, one per matched element in a locator.
+                        Think of it as -> elements.map(el => el.textContent)
+
+          <ul>
+            <li class="item">Apple</li>
+            <li class="item" style="display:none">Banana</li>
+            <li class="item">
+              Cherry
+              <span style="display:none">Hidden</span>
+            </li>
+          </ul>
+
+          await page.textContent('.item'); -> "Apple"
+          -------------------------------
+
+          await page.locator('.item').allTextContents();
+          ----------------------------------------------
+
+          Returns raw DOM text for each matched element:
+
+          [
+            "Apple",
+            "Banana",
+            "\n    Cherry\n    Hidden\n  "
+          ]
+
+          ✔ Includes hidden text
+          ✔ Preserves whitespace
+          ✔ No CSS/layout awareness
+          ✔ Order matches DOM order
+
+          allInnerTexts()
+          ---------------
+
+        await page.locator('.item').allInnerTexts();
+
+        Result:
+
+        [
+          "Apple",
+          "Cherry"
+        ]
+
+
+        ❌ Hidden elements excluded
+        ✅ Whitespace normalized
+        ❌ Triggers layout (slower)
+        ✅ Matches what a user sees
+
+        Playwright assert:
+        toHaveText() ≈ innerText() + auto-waiting + retries + stability checks */
+
 test.only('Extract text from locator', async ({ page }) => {
 
   const url: string = 'https://practice-automation.com/tables/';
@@ -53,7 +147,7 @@ test.only('Extract text from locator', async ({ page }) => {
   await expect(page).toHaveTitle(expectedPageTitle);
   await expect(tableCellLocator.first()).toBeVisible();
 
-  expect(await tableCellLocator.first().innerText()).toBe('Item');
+  expect(await tableCellLocator.first().textContent()).toBe('Item');
   expect(await tableCellLocator.first()).toContainText('Item');
   expect(await tableCellLocator.first()).toContainText(/^Item$/);
 });
