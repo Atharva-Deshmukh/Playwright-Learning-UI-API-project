@@ -171,3 +171,83 @@ test('Types of locators', async ({ page }) => {
   await expect(buttonLocator.first()).toBeVisible();
 });
 
+/* Waiting for states
+---------------------
+
+waitForLoadState() waits for browser lifecycle events, not UI elements.
+It does not care about buttons, spinners, or text — only about how far the page has loaded.
+
+1️⃣ domcontentloaded -> await page.waitForLoadState('domcontentloaded');
+
+HTML is downloaded and parsed
+DOM exists
+❌ Images, fonts, CSS may still be loading
+❌ JS may still be running
+
+
+Mental model:
+📄 “The skeleton is ready”
+
+2️⃣ load (default) -> await page.waitForLoadState('load');
+
+“Everything referenced in HTML is loaded”
+
+Waits for:
+  images
+  CSS
+  fonts
+  subframes
+
+Mental model:
+🖼️ “The page looks complete”
+
+3️⃣ networkidle -> await page.waitForLoadState('networkidle');
+
+“Network has gone quiet”
+
+Means:
+  No network requests for ~500 ms
+  network tab is stable now
+  Not counting websockets
+
+Use when:
+  Page loads data via APIs
+  SPA initial data fetches
+
+Mental model:
+📡 “The app stopped talking to the server”
+
+⚠️ Danger:
+
+Can hang forever polling (Polling means repeatedly asking something for updates at a fixed interval.)
+Not recommended for apps with long-lived requests
+
+------------------------------------------------------------------
+Hard Wait -> await page.waitForTimeout(3000);
+
+------------------------------------------------------------------
+locator.waitFor() 
+
+state (optional) -> "attached" | "detached" | "visible" | "hidden"
+
+By default, it waits until the element:
+  exists in the DOM
+  is visible
+
+This is equivalent to -> await expect(locator).toBeVisible();
+
+await page.locator('.spinner').waitFor({ state: 'hidden' });
+Better way ->  await expect(page.locator('.spinner')).toBeHidden();
+
+await page.click('button');
+await page.locator('.success').waitFor();
+Still better -> await expect(page.locator('.success')).toBeVisible();
+
+Use it when:
+  You need a sync point
+  But you don’t want an assertion
+  You’re preparing for a next action
+
+
+*/
+
