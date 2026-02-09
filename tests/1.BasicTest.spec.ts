@@ -135,7 +135,19 @@ test('Locator with multiple matches', async ({ page }) => {
         ✅ Matches what a user sees
 
         Playwright assert:
-        toHaveText() ≈ innerText() + auto-waiting + retries + stability checks */
+        toHaveText() ≈ innerText() + auto-waiting + retries + stability checks
+        
+        NOTE: allTextContent() extracts text only once after DOM is attached, means DOM is visible in inspect
+        but after that if we modify DOM, like write user name in <input>, allTextContent() is not able to
+        capture it, we use <textarea> OR <input> .inputValue() method 
+        
+        Works only for:
+          <input>
+          <textarea>
+          <select>
+
+          await expect(input2.inputValue()).toBe(message);
+        */
 
 test.only('Extract text from locator', async ({ page }) => {
 
