@@ -129,39 +129,84 @@ test('Configured Basic Authentication Way-3', async ({ page }) => {
   await expect(authSuccessLocator).toBeVisible();
 });
 
-/* Scenario:
-   - Popup will appear randomly after max. 6 seconds
-   - until its closed, no further action is possible
+/* page.addLocatorHandler() 
 
-   We will use await page.addLocatorHandler()
-   This method lets you set up a special function, called a handler, 
-   that activates when it detects that overlay is visible. The handler's job is to remove the overlay, 
-   allowing your test to continue as if the overlay wasn't there.
+  In real apps, stuff randomly blocks your test:
+    Cookie banners
+    “Accept terms” modals
+    Newsletter popups
+    “What’s new” dialogs
 
-   Playwright checks for the overlay every time before executing or retrying an action that requires an 
-   actionability check, or before performing an auto-waiting assertion check. When overlay is visible, 
-   Playwright calls the handler first, and then proceeds with the action/assertion. Note that the 
-   handler is only called when you perform an action/assertion - if the overlay becomes visible 
-   but you don't perform any actions, the handler will not be triggered.
+  They can appear:
+    only sometimes
+    on different pages
+    in the middle of an action
 
+   The core idea of page.addLocatorHandler()
+
+    You register a rule: -> “Whenever this locator appears, automatically run this code.”
+
+    Playwright then:
+      keeps watching the page
+      if the locator matches something visible
+      it runs your handler before your test action fails
+      Think of it as an automatic popup interceptor.
+
+   What actually happens under the hood
+
+  When your test runs -> await page.click('#buy-button');
+
+  Playwright internally:
+    Tries to perform the click
+    Notices the click is blocked or interrupted
+    Checks registered locator handlers
+    Sees “Accept cookies” is visible
+    Runs your handler
+    Retries the original action
+    Your test never even knows the popup existed.
+
+    ORIGINAL ACTION that playwright was trying to do before the modal/overlay appeared is retried
+
+
+
+  Now, we need to know noWaitAfter flag
+  By default, most actions auto-wait.
+  Example -> await page.click('a#login');
+
+  Playwright assumes:
+
+  “This click might trigger navigation, DOM changes, or page load — I’ll wait until things settle.”
+
+  So it waits for:
+    navigation (if any)
+    network idle / DOM stability
+    the action to be “complete”
+
+  noWaitAfter tells Playwright -> “Do the action, but don’t wait for whatever it triggers.”
+
+  It does not:
+    skip waiting for the element to be clickable
+    skip visibility checks
+    skip actionability checks
+
+  It only skips waiting after the action.
+
+  Why this flag exists?
+  ---------------------
+  Some actions intentionally trigger things Playwright shouldn’t wait for.
+
+  like Opening a new tab / popup
+
+  await page.click('a[target=_blank]', { noWaitAfter: true });
+
+  Without noWaitAfter, Playwright might:
+    wait forever
+    assume a navigation that never finishes
+
+  
    We also need to specify when to stop waiting for the handler
    -------------------------------------------------------------
-   An example with a custom callback on every actionability check. It uses a <body> 
-   locator that is always visible, so the handler is called before every actionability check. 
-   It is important to specify noWaitAfter, because the handler does not hide the <body> element.
-
-  // Setup the handler.
-  await page.addLocatorHandler(page.locator('body'), async () => {
-    await page.evaluate(() => window.removeObstructionsForTestIfNeeded());
-  }, { noWaitAfter: true });
-
-  By default, after calling the handler Playwright will wait until the overlay becomes hidden, 
-  and only then Playwright will continue with the action/assertion that triggered the handler. 
-  This option allows to opt-out of this behavior, so that overlay can stay visible after the handler has run.
-
-  // Write the test as usual.
-  await page.goto('https://example.com');
-  await page.getByRole('button', { name: 'Start here' }).click();
+   Locator version (preferred nowadays) -> await page.locator('#save').click({ noWaitAfter: true });
 
   You can also automatically remove the handler after a number of invocations by setting times:
     await page.addLocatorHandler(page.getByLabel('Close'), async locator => {
