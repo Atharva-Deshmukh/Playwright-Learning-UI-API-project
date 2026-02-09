@@ -8,3 +8,19 @@ TOPICS COVERED:
 --------------
 Browser Context
 Timeouts
+TEXT EXTRACTION
+WaitFor, waitForTimeout, waitForLoadState
+Dropdowns
+page.pause() and playwright inspector
+Radio buttons and checkboxes
+To validate any blinking element, just assert on the class or style that gives it this behaviour
+Alert
+Confirm
+Prompt
+Auth handling
+modals
+new tab/page
+child tab/popup, window
+
+reading <input> and <textarea> text, since they are written after DOM is attached/displayed in inspect, hence
+not captured via textContent(), innerText()
