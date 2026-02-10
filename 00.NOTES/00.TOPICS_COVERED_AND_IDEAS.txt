@@ -1,6 +1,7 @@
 IDEAS:
 -----
 Timeouts - TODO
+Locators writing practice in playwright
 
 
 TOPICS COVERED:
@@ -26,3 +27,13 @@ not captured via textContent(), innerText()
 
 Multiple locators handling
 Keyboard delay so that we can assert on autosuggestion dropdowns
+
+Interview question:
+- In a table, interviewer asks to click a row button of specific id row
+  U just need to scan the whole row and click the button by locator chaining in for loop
+ 
+  row = locator('table tr'); // matches say 8
+  for(let i = 0; i < await row.count(); i++) {
+    rowId = row.nth(i).locator('id');
+    if(rowId === INPUT_ID) await row.locator('button').click()
+  }
