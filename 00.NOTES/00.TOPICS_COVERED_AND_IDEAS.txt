@@ -23,3 +23,6 @@ child tab/popup, window
 
 reading <input> and <textarea> text, since they are written after DOM is attached/displayed in inspect, hence
 not captured via textContent(), innerText()
+
+Multiple locators handling
+Keyboard delay so that we can assert on autosuggestion dropdowns
