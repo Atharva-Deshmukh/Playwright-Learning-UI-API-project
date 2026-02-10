@@ -37,5 +37,12 @@ test('Simulating user typing with some delay and filling characters sequentially
   await expect(input1).toBeVisible();
   await expect(input2).toBeVisible();
 
+  /*
+  await locator.pressSequentially('Hello'); // Types instantly
+  await locator.pressSequentially('World', { delay: 100 }); // Types slower, like a user
+
+  This delay is useful when we need autosuggestion dropdowns to appear and we want to assert on them
+  */
+
   await input1.pressSequentially(message, {delay: 500});
 });
