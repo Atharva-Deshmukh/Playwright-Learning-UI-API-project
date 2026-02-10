@@ -21,6 +21,33 @@ test('Verify alert', async ({ page }) => {
       await page.waitForTimeout(5000); // Hard Wait for 5 seconds to observe the alert
   });
 
+
+  /* Another cleaner way */
+  const dialogPromise = page.waitForEvent('dialog');
+
+  await page.locator('#alertBtn').click();
+
+  const dialog = await dialogPromise;
+  expect(dialog.type()).toBe('alert');
+  expect(dialog.message()).toBe('I am an alert box!');
+  await dialog.accept();
+
+  /* To handle multiple alerts */
+  let alertCount = 0;
+
+  page.on('dialog', async (dialog) => {
+    alertCount++;
+
+    if (alertCount === 1) {
+      expect(dialog.type()).toBe('alert');
+      expect(dialog.message()).toBe('I am an alert box!');
+      await dialog.accept();
+    } else {
+      // optional: handle or ignore extra alerts
+      await dialog.accept();
+    }
+  });
+
 });
 
 test('Verify Confirmation with OK', async ({ page }) => {
