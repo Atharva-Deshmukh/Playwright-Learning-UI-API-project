@@ -21,6 +21,34 @@ test('Verify page title', async ({ page }) => {
 
 test('Locator with multiple matches', async ({ page }) => {
 
+  /* In cypress, we do
+
+      cy.get('.item').each(($el, index, $list) => {
+        cy.wrap($el).click()
+      });
+
+    In Playwright, we have two ways:
+
+    Way-1: locator.nth(i) loops (Prefer this mostly), because here, playwright requeries entire locator chain
+           for every i
+
+            const items = page.locator('.item') -->locator() automatically finds all the matches like cy.get()
+            const count = await items.count() 
+            for (let i = 0; i < count; i++) {
+              await items.nth(i).click()
+            }
+
+    Way-2: use locator.all() -> But this gives snapshot/state of all locator handlers that we got for the
+           first time, no re-query, this is risky
+
+          const elementsArray = await page.locator('.item').all()
+
+          for (const el of elementsArray) {
+            await el.click()
+          }
+  
+  */
+
   const url: string = 'https://practice-automation.com/tables/';
   const expectedPageTitle: string = 'Tables | Practice Automation';
   const tableCellLocator = await page.locator('.wp-block-table td');
