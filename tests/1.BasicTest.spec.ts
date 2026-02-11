@@ -19,6 +19,40 @@ test('Verify page title', async ({ page }) => {
   console.log(`Test passed: Page title is "${pageTitle}" as expected.`);
 });
 
+/* Limitations of getByLabel():
+  -----------------------------
+
+- Whenever there is some kind of association, then only we can use this getByLabel() to 
+  access say some input box and type in that, if no association is there, then accessing is also
+  not possible
+
+Ex: await page.getByLabel("Password").fill("Admin1234");
+
+This will only work for below Kind of associated DOM
+
+<label> 
+  Password
+
+  <input type = "password" />
+
+</label>
+
+Here, input is associated via wrapping it inside the label tag, hence the above locator works
+
+-----------------------------------------------------------------------------------------------
+Ex: <label for="associationHere"> Password </label>
+<input class="myClass" id="associationHere" type="password">
+
+Here also, the above locator will work since there is association via reference in attributes for and id
+
+-----------------------------------------------------------------------------------------------
+Ex: <label for="associationHere"> Password </label>
+    <input class="myClass" id="Different" type="password">  
+    
+Here, the locator WONT WORK - as there is no association provided.
+
+*/
+
 test('Locator with multiple matches', async ({ page }) => {
 
   /* In cypress, we do
