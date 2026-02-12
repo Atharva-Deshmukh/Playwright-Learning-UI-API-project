@@ -80,3 +80,47 @@ test('Handling nested frames/inner frames/frames inside frames', async ({ page }
   
 
 });
+
+/* In Cypress, this is verbose
+
+describe('Handling nested frames/inner frames', () => {
+
+  it('Handles iframe inside iframe', () => {
+
+    const url = 'https://ui.vision/demo/webtest/frames/';
+    const title = 'Frames - Web Automation Test';
+
+    cy.visit(url);
+    cy.title().should('eq', title);
+
+    // STEP 1: Get Frame 3 (outer iframe)
+    cy.get('frame[src="frame_3.html"]')
+      .its('0.contentDocument.body')
+      .should('not.be.empty')
+      .then(cy.wrap)
+      .within(() => {
+
+        // Verify text inside outer frame
+        cy.contains('iframe inside frame:').should('be.visible');
+
+        // STEP 2: Get inner iframe
+        cy.get('iframe')
+          .its('0.contentDocument.body')
+          .should('not.be.empty')
+          .then(cy.wrap)
+          .within(() => {
+
+            // Locate and fill input inside inner frame
+            cy.get('.JGptt [aria-label="Other response"]')
+              .should('be.visible')
+              .type('This is a test input inside an inner frame');
+
+          });
+
+      });
+
+  });
+
+});
+
+*/
