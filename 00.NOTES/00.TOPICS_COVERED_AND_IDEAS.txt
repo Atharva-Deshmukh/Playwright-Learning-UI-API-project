@@ -10,6 +10,10 @@ Browser Context
 Timeouts
 TEXT EXTRACTION
 WaitFor, waitForTimeout, waitForLoadState
+
+Different type of locators in playwright
+Limitations of getByLabel()
+
 Dropdowns
 page.pause() and playwright inspector
 Radio buttons and checkboxes
@@ -37,3 +41,21 @@ Interview question:
     rowId = row.nth(i).locator('id');
     if(rowId === INPUT_ID) await row.locator('button').click()
   }
+
+  Calendar - Just locators and little logic
+
+ Playwright Inspector
+  Debugging flaky tests in playwright using --debug - This opens inspector with step over and resume options
+  We can write our own locators in the middle of the scripts
+
+  Playwright codegen tool - Never used it. Its just a tool to generate scripts from the actions performed while
+  recording. We can also add assertions on the go, but its just a boiler plate, real world tests are more complex
+  This codegen tool can be used to quickly convert the script from one language to another
+
+Trace, zip file, Reporting (little bit)
+
+Visibility locators: .toBeVisible(), .toBeHidden()
+
+Web navigations
+Hover
+Iframes vs handling in cypress
