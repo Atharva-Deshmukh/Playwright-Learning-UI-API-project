@@ -40,6 +40,9 @@ import { test, expect } from '@playwright/test';
                 reporter: 'html',
         - Way-2: Command line option => yarn run  playwright test --reporter=html
 
+        in the directory, we have playwright-report directory, just search the index.html, copy its path
+        open in browser, we can directly open HTML reports in the browser by copying the local path
+
                                         JSON Reporter:
                                         --------------  
          JSON reporter produces an object with all information about the test run.
